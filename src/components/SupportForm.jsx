@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 function SupportForm() {
   const [formData, setFormData] = useState({
@@ -15,7 +16,6 @@ function SupportForm() {
   const [errors, setErrors] = useState({});
   const [summary, setSummary] = useState(null);
 
-  // Load draft
   useEffect(() => {
     const draft = localStorage.getItem("support_form_draft");
     if (draft) {
@@ -49,7 +49,11 @@ function SupportForm() {
     if (!formData.consent) newErrors.consent = "Consent required";
 
     setErrors(newErrors);
-    if (Object.keys(newErrors).length) return;
+
+    if (Object.keys(newErrors).length) {
+      toast.error("Please fix form errors");
+      return;
+    }
 
     setSummary({
       title: `${formData.issue} • ${formData.urgency}`,
@@ -62,9 +66,10 @@ function SupportForm() {
       ].filter(Boolean),
     });
 
+    toast.success("Support request submitted successfully ✅");
+
     localStorage.removeItem("support_form_draft");
 
-    // reset form
     setFormData({
       name: "",
       email: "",
@@ -124,7 +129,6 @@ function SupportForm() {
           <option>Volunteer Registration</option>
           <option>General Inquiry</option>
         </select>
-        {errors.issue && <p className="text-xs text-red-600">{errors.issue}</p>}
 
         <select
           name="urgency"
@@ -137,9 +141,6 @@ function SupportForm() {
           <option>Medium</option>
           <option>High</option>
         </select>
-        {errors.urgency && (
-          <p className="text-xs text-red-600">{errors.urgency}</p>
-        )}
 
         <textarea
           name="message"
@@ -149,9 +150,6 @@ function SupportForm() {
           onChange={handleChange}
           className="w-full border rounded-lg px-3 py-2"
         />
-        {errors.message && (
-          <p className="text-xs text-red-600">{errors.message}</p>
-        )}
 
         <label className="flex items-center gap-2 text-sm">
           <input
@@ -162,9 +160,6 @@ function SupportForm() {
           />
           I consent to data processing
         </label>
-        {errors.consent && (
-          <p className="text-xs text-red-600">{errors.consent}</p>
-        )}
 
         <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
           Submit Request
